@@ -45,7 +45,7 @@ export default function HeroSequence() {
             for (let i = 1; i <= SUKUNA_COUNT; i++) {
                 sukunaPromises.push(new Promise((resolve) => {
                     const img = new Image();
-                    img.src = `/assets/sukuna/${i.toString().padStart(4, '0')}.jpg`;
+                    img.src = `/assets/Sukuna/${i.toString().padStart(4, '0')}.jpg`;
                     img.onload = img.onerror = () => {
                         loadedCount++;
                         setLoadProgress(Math.round((loadedCount / TOTAL_ASSETS) * 100));
@@ -98,14 +98,18 @@ export default function HeroSequence() {
             const index = Math.round(anime.frame);
             if (images[index]) {
                 const img = images[index];
-                context.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Crop logic (removing bottom 150px)
-                const cropBottom = 150;
-                const sWidth = img.width;
-                const sHeight = img.height - cropBottom;
+                // Safety check to prevent crash on broken images
+                if (img && img.complete && img.naturalHeight !== 0) {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
 
-                context.drawImage(img, 0, 0, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+                    // Crop logic (removing bottom 150px)
+                    const cropBottom = 150;
+                    const sWidth = img.width;
+                    const sHeight = img.height - cropBottom;
+
+                    context.drawImage(img, 0, 0, sWidth, sHeight, 0, 0, canvas.width, canvas.height);
+                }
             }
         };
 

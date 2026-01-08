@@ -91,7 +91,7 @@ export default function SukunaSequence({ preloadedImages }) {
         const render = () => {
             const index = Math.round(anime.frame);
             const img = images[index];
-            if (img) {
+            if (img && img.complete && img.naturalHeight !== 0) {
                 context.clearRect(0, 0, canvas.width, canvas.height);
                 context.drawImage(img, 0, 0, canvas.width, canvas.height);
             }
