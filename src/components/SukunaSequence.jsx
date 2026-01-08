@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 const FRAME_COUNT = 191;
 const IMAGES_BASE_PATH = '/assets/sukuna/';
 
-export default function SukunaSequence() {
+export default function SukunaSequence({ preloadedImages }) {
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
     const scrollDriverRef = useRef(null);
@@ -23,6 +23,12 @@ export default function SukunaSequence() {
 
     // 1. Preload Images
     useEffect(() => {
+        if (preloadedImages && preloadedImages.length > 0) {
+            imagesRef.current = preloadedImages;
+            setIsLoading(false);
+            return;
+        }
+
         let loadedCount = 0;
         const imgArray = [];
 
@@ -59,7 +65,7 @@ export default function SukunaSequence() {
         };
 
         preloadImages();
-    }, []);
+    }, [preloadedImages]);
 
     // 2. Animation Logic
     useEffect(() => {
@@ -155,17 +161,17 @@ export default function SukunaSequence() {
             }, ">-2");
 
             // Section 2 Text
-            gsap.from(".sukuna-section-2-text", {
-                x: 100,
-                opacity: 0,
-                scrollTrigger: {
-                    trigger: ".sukuna-section-2",
-                    scroller: scrollerEl,
-                    start: "top center",
-                    end: "bottom center",
-                    scrub: 1
-                }
-            });
+            // gsap.from(".sukuna-section-2-text", {
+            //     x: 100,
+            //     opacity: 0,
+            //     scrollTrigger: {
+            //         trigger: ".sukuna-section-2",
+            //         scroller: scrollerEl,
+            //         start: "top center",
+            //         end: "bottom center",
+            //         scrub: 1
+            //     }
+            // });
 
             // Section 3 Text
 
@@ -237,7 +243,7 @@ export default function SukunaSequence() {
                         <div className="h-[100vh]"></div>
 
                         {/* Section 2 */}
-                        <section className="sukuna-section-2 h-screen flex flex-col justify-end items-center text-center p-8 pb-[20vh]">
+                        {/* <section className="sukuna-section-2 h-screen flex flex-col justify-end items-center text-center p-8 pb-[20vh]">
                             <div className="sukuna-section-2-text">
                                 <h2 className="font-[Oswald] text-[5rem] text-white drop-shadow-[2px_2px_0_#ff0000]">
                                     ABSOLUTE POWER
@@ -246,7 +252,7 @@ export default function SukunaSequence() {
                                     "Know your place, fool."
                                 </p>
                             </div>
-                        </section>
+                        </section> */}
 
                         {/* Section 3 */}
 

@@ -15,43 +15,53 @@ export default function HeroSequence() {
     const containerRef = useRef(null);
     const [isLoading, setIsLoading] = useState(true);
     const [loadProgress, setLoadProgress] = useState(0);
-    const imagesRef = useRef([]); // Use ref for images to avoid re-renders or dependency issues
+    const imagesRef = useRef([]);
+    const [sukunaImages, setSukunaImages] = useState(null);
 
-    // 1. Preload Images & Setup
+    // 1. Preload Images (Unified Loader)
     useEffect(() => {
         let loadedCount = 0;
-        const imgArray = [];
+        const heroPromises = [];
+        const sukunaPromises = [];
 
-        // Preload logic
+        const SUKUNA_COUNT = 191;
+        const TOTAL_ASSETS = (FRAME_COUNT + 1) + SUKUNA_COUNT;
+
         const preloadImages = async () => {
-            const promises = [];
-
+            // Load Hero (0-191)
             for (let i = 0; i <= FRAME_COUNT; i++) {
-                const promise = new Promise((resolve) => {
+                heroPromises.push(new Promise((resolve) => {
                     const img = new Image();
-                    const formattedIndex = i.toString().padStart(3, '0');
-                    img.src = `${IMAGES_BASE_PATH}${formattedIndex}.jpg`;
-
-                    img.onload = () => {
+                    img.src = `${IMAGES_BASE_PATH}${i.toString().padStart(3, '0')}.jpg`;
+                    img.onload = img.onerror = () => {
                         loadedCount++;
-                        setLoadProgress(Math.round((loadedCount / (FRAME_COUNT + 1)) * 100));
+                        setLoadProgress(Math.round((loadedCount / TOTAL_ASSETS) * 100));
                         resolve(img);
                     };
-                    img.onerror = () => {
-                        console.error(`Failed to load frame ${i}`);
-                        loadedCount++; // Count error as loaded to prevent stuck loader
-                        setLoadProgress(Math.round((loadedCount / (FRAME_COUNT + 1)) * 100));
-                        resolve(null);
-                    };
-                    imgArray[i] = img;
-                });
-                promises.push(promise);
+                }));
             }
 
-            await Promise.all(promises);
-            imagesRef.current = imgArray;
+            // Load Sukuna (1-191)
+            for (let i = 1; i <= SUKUNA_COUNT; i++) {
+                sukunaPromises.push(new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = `/assets/sukuna/${i.toString().padStart(4, '0')}.jpg`;
+                    img.onload = img.onerror = () => {
+                        loadedCount++;
+                        setLoadProgress(Math.round((loadedCount / TOTAL_ASSETS) * 100));
+                        resolve(img);
+                    };
+                }));
+            }
 
-            // Artificial delay to ensure 100% shows briefly or smoother transition
+            const [heroImgs, sukunaImgs] = await Promise.all([
+                Promise.all(heroPromises),
+                Promise.all(sukunaPromises)
+            ]);
+
+            imagesRef.current = heroImgs;
+            setSukunaImages(sukunaImgs);
+
             setTimeout(() => {
                 setIsLoading(false);
             }, 500);
@@ -190,7 +200,7 @@ export default function HeroSequence() {
     if (isLoading) {
         return (
             <div id="loader" className="fixed top-0 left-0 w-full h-full bg-black text-[#bb0a0a] flex justify-center items-center z-[9999] font-[Oswald] text-2xl">
-                LOADING CURSED ENERGY... {loadProgress}%
+                LOADING DOMAIN EXPANSION... {loadProgress}%
                 <style jsx global>{`
                     @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Permanent+Marker&family=Roboto:wght@300;500&display=swap');
                 `}</style>
@@ -236,7 +246,7 @@ export default function HeroSequence() {
 
                 .hero-title {
                     font-family: 'Permanent Marker', cursive;
-                    font-size: clamp(6rem, 18vw, 15rem);
+                    font-size: clamp(3.5rem, 18vw, 15rem);
                     color: #000000; 
                     -webkit-text-stroke: 0;
                     line-height: 0.85;
@@ -248,7 +258,7 @@ export default function HeroSequence() {
 
                 h1 {
                     font-family: 'Zen Tokyo Zoo', cursive;
-                    font-size: clamp(4rem, 15vw, 12rem);
+                    font-size: clamp(3.5rem, 15vw, 12rem);
                     color: transparent;
                     -webkit-text-stroke: 2px var(--c-white); /* Outline style */
                     margin-bottom: 1rem;
@@ -345,7 +355,7 @@ export default function HeroSequence() {
                     {/* Section 3: Domain Expansion */}
                     <section className="section-3 h-screen flex flex-col justify-center items-center text-center p-8">
                         <h2
-                            className="section-3-text glitch font-['Permanent_Marker'] text-[4rem] text-[#bb0a0a] mb-8"
+                            className="section-3-text glitch font-['Permanent_Marker'] text-[clamp(2.5rem,10vw,5rem)] text-[#bb0a0a] mb-8"
                             data-text="DOMAIN EXPANSION"
                         >
                             DOMAIN EXPANSION
@@ -359,7 +369,7 @@ export default function HeroSequence() {
 
             {/* Main Content Overlay - Fixed on top, initially hidden */}
             <div className="main-content-wrapper fixed top-0 left-0 w-full h-full z-50 opacity-0 pointer-events-none overflow-y-auto bg-black">
-                <SukunaSequence />
+                <SukunaSequence preloadedImages={sukunaImages} />
             </div>
         </div>
     );

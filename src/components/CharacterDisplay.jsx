@@ -36,7 +36,7 @@ export default function CharacterDisplay() {
                 .char-grid {
                     display: grid;
                     grid-template-columns: repeat(12, 1fr);
-                    grid-template-rows: repeat(2, 400px);
+                    grid-auto-rows: 400px; 
                     gap: 1.5rem;
                     width: 100%;
                     max-width: 1600px;
@@ -58,10 +58,35 @@ export default function CharacterDisplay() {
                 }
 
                 /* Bento Grid Layout logic - GTA Style Layout */
+                /* Desktop */
                 .tile-1 { grid-column: span 4; grid-row: span 2; } /* Large Left */
                 .tile-2 { grid-column: span 4; grid-row: span 1; }
                 .tile-3 { grid-column: span 4; grid-row: span 1; }
                 .tile-4 { grid-column: span 8; grid-row: span 1; } /* Wide Bottom */
+
+                /* Tablet (Stack Vertical) */
+                @media (max-width: 1024px) {
+                    .char-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                        grid-auto-rows: 400px; 
+                    }
+                    .tile-1 { grid-column: span 2; grid-row: span 2; }
+                    .tile-2 { grid-column: span 1; grid-row: span 1; }
+                    .tile-3 { grid-column: span 1; grid-row: span 1; }
+                    .tile-4 { grid-column: span 2; grid-row: span 1; }
+                }
+
+                /* Mobile (Full Stack) */
+                @media (max-width: 768px) {
+                    .char-grid {
+                        grid-template-columns: 1fr;
+                        grid-auto-rows: 500px; /* Taller on mobile for detail */
+                    }
+                    .tile-1, .tile-2, .tile-3, .tile-4 {
+                        grid-column: span 1;
+                        grid-row: span 1;
+                    }
+                }
 
                 .char-overlay {
                     position: absolute;
